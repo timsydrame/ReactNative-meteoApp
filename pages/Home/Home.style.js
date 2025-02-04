@@ -10,6 +10,15 @@ const s = StyleSheet.create({
   meteo_advanced: {
     flex: 1,
   },
+  clockContainer: {
+    alignItems: "center", // Centrer l'horloge
+    paddingVertical: 10,
+  },
+ text: {
+    fontSize: 40, // Taille du texte
+    fontWeight: "bold", // Mettre le texte en gras
+    color: "#fff", // Couleur du texte (blanc)
+  },
 });
 
 export { s };

@@ -4,11 +4,14 @@ const s = StyleSheet.create({
   clock: {
     alignItems: "flex-end",
   },
+
   weather_label: {
     alignSelf: "flex-end",
     transform: [{ rotate: "-90deg" }],
-    fontSize: 20,
+    fontSize: 30,
+    color: "white",
   },
+
   image: {
     height: 90,
     width: 90,
@@ -19,7 +22,14 @@ const s = StyleSheet.create({
     justifyContent: "space-between",
   },
   temperature: {
-    fontSize: 150,
+    fontSize: 160,
+    color: "white",
+  },
+  city:{
+    fontSize: 30,
+  },
+  text: {
+    color: "white",
   },
 });
 

@@ -1,4 +1,4 @@
-import { View, Text } from "react-native"; // ✅ Fusionné en un seul import
+import { View, Text } from "react-native";
 import { s } from "./Home.style";
 import {
   requestForegroundPermissionsAsync,
@@ -10,6 +10,7 @@ import { MeteoBasic } from "../../components/MeteoBasic/MeteoBasic";
 import { getWeatherInterpretation } from "../../services/meteo-service";
 
 export function Home() {
+  const [city, setCity] = useState(""); // Ajouter un état pour la ville
   const [coords, setCoords] = useState(null);
   const [weather, setWeather] = useState(null);
   const currentWeather = weather?.current_weather;
@@ -19,57 +20,52 @@ export function Home() {
   }, []);
 
   useEffect(() => {
-    if (coords && !weather) {
+    if (coords) {
+      fetchCity(coords);
       fetchWeather(coords);
     }
-  }, [coords]); // Ne se déclenche que si `coords` change
+  }, [coords]);
 
   async function getUserCoords() {
     let { status } = await requestForegroundPermissionsAsync();
     if (status === "granted") {
       const location = await getCurrentPositionAsync();
-      console.log("Nouvelle position:", location.coords); // Debug
-      setCoords((prevCoords) => {
-        if (
-          !prevCoords ||
-          prevCoords.lat !== location.coords.latitude ||
-          prevCoords.lng !== location.coords.longitude
-        ) {
-          return {
-            lat: location.coords.latitude,
-            lng: location.coords.longitude,
-          };
-        }
-        return prevCoords; // Empêche la mise à jour inutile
+      setCoords({
+        lat: location.coords.latitude,
+        lng: location.coords.longitude,
       });
     } else {
-      console.log("Permission refusée, utilisation des coordonnées par défaut");
       setCoords({ lat: 48.85, lng: 2.35 });
     }
   }
 
   async function fetchWeather(coordinates) {
-    console.log("Récupération de la météo pour:", coordinates); // Debug
     try {
       const weatherResponse = await MeteoAPI.fetchWeatherFromCoords(coordinates);
-      console.log("Données météo récupérées:", weatherResponse); // Debug
       setWeather(weatherResponse);
     } catch (error) {
       console.error("Erreur lors de la récupération de la météo:", error);
     }
   }
 
+  async function fetchCity(coordinates) {
+    try {
+      const cityResponse = await MeteoAPI.fetchCityFromCoords(coordinates);
+      setCity(cityResponse); // Mettre à jour la ville
+    } catch (error) {
+      console.error("Erreur lors de la récupération de la ville:", error);
+    }
+  }
+
   return currentWeather ? (
     <>
-      <View style={s.meteo_basic}>
+      <View style={[s.meteo_basic, s.text]}>
         <MeteoBasic
           temperature={Math.round(currentWeather?.temperature)}
-          city="Ville inconnue"
+          city={city || "Ville inconnue"}  // Afficher la ville
           interpretation={getWeatherInterpretation(currentWeather.weathercode)}
         />
       </View>
-      <View style={s.searchbar_container}></View>
-      <View style={s.meteo_advanced}></View>
     </>
   ) : (
     <View style={s.loadingContainer}>
